@@ -534,15 +534,16 @@ namespace testBot
                 {
                     DateTime dateTime = new DateTime(2017, 5, 5);
                     string helpStr = string.Empty;
-                    helpStr += "```bash\n" +
-                    "RexBot v1.0 made by Rexyrex\n" +
+                    helpStr += "```Markdown\n" +
+                    "RexBot v1.0.1 made by Rexyrex\n" +
                     "===========================\n";
-                    helpStr += "Mode : " + mode + " - " + modes[mode].getDescription() + "\n";
-                    helpStr += "Code : " + "1507 lines" + "\n";
-                    helpStr += "Age : " + Math.Round((DateTime.Now - dateTime).TotalDays,2) + " days" + "\n";
-                    helpStr += "Current Time : " + DateTime.Now.ToString() + "\n";
-                    helpStr += "Latest Developer Update : <" + devUpdate + ">\n";
-                    helpStr += "Coming Soon : <" + comingSoon + ">\n";
+                    helpStr += "[Mode] " + mode + " - " + modes[mode].getDescription() + "\n";
+                    helpStr += "[Code] " + "1507 lines" + "\n";
+                    helpStr += "[Age :] " + Math.Round((DateTime.Now - dateTime).TotalDays,2) + " days" + "\n";
+                    helpStr += "[Current Time] " + DateTime.Now.ToString() + "\n";
+                    helpStr += "[Latest Developer Update] <" + devUpdate + ">\n";
+                    helpStr += "[Coming Soon] <" + comingSoon + ">\n";
+                    helpStr += "[Github] <" + "https://github.com/rexyrex/testBot" + " >\n";
                     helpStr += "```";
                     await e.Channel.SendMessage(helpStr);
                 });
@@ -942,7 +943,7 @@ namespace testBot
                     }
                     
                 });
-            commands.CreateCommand("allreports")
+            commands.CreateCommand("reports")
                 .Description("see reports")
                 .Do(async (e) =>
                 {
