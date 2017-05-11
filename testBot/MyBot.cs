@@ -53,7 +53,6 @@ namespace testBot
         string comingSoon = "Report Command Fix";
 
         string mode = "jamie";
-        bool userLoadRequst = false;
 
 
         Random rnd;
@@ -109,18 +108,6 @@ namespace testBot
             modes.Add("loud", new RexMode("loud", "Many auto triggers. Status changes.", new string[] { "functions","trigger 60","status" }));
             modes.Add("tooloud", new RexMode("tooloud", "RexBot on Steroids", new string[] { "functions","trigger 100", "status" }));
             modes.Add("cat", new RexMode("cat", "Posts a cat photo for every message, as well as a snarky comment", new string[] { "functions", "trigger 100", "status","cat" }));
-
-            //aliases.Add(new string[] { "Schafer", "henry", "henhen","yrneh" }, "<:henryface:309024772971298816>");
-            //aliases.Add(new string[] { "Ryanne", "Schäfer", "guki", "gukimon" }, "<:gukiface:309032781327892480>");
-            //aliases.Add(new string[] { "andy" }, "Andy");
-            //aliases.Add(new string[] { "Wolfy", "ryan", "ryry","ryanna","wolf" }, "<:ryanface2:308726136681267201>");
-            //aliases.Add(new string[] { "Geffo", "geoff", "geoffo", "omni", "omnisexy" }, "<:geoffface:309030675472973834>");
-            //aliases.Add(new string[] { "Pash", "pash", "pgod" }, "<:pashface:309032171379621889>");
-            //aliases.Add(new string[] { "BonoboCop", "xander", "conductor" }, "<:xanderface:309027227855486986>");
-            //aliases.Add(new string[] { "rooster212", "jamie", "yaymie" }, "<:jamieface:308721678442299394>");
-            //aliases.Add(new string[] { "CPTOblivious", "nick", "silencer" }, "<:nickface:309026407139246100>");
-            //aliases.Add(new string[] { "Rexyrex", "rexy", "rexyrex","adrian" }, "<:adrianface:309027765695545344>");
-            //aliases.Add(new string[] { "RayRay", "ray", "rayray", "raydrian" }, "<:rayface:309025821367074817>");
 
             Console.WriteLine("Starting population...");
             populate(adjList, "adjective.txt");
@@ -230,10 +217,8 @@ namespace testBot
                                     type += stz[i];
                             }
                         }
-                        topText = topText.Replace(' ', '-');
-                        botText = botText.Replace(' ', '-');
-                        Console.WriteLine(topText);
-                        Console.WriteLine(botText);
+                        topText = processTextForMeme(topText);
+                        botText = processTextForMeme(botText);
                         await e.Channel.SendMessage("https://memegen.link/" + type + "/" + topText + "/" + botText + ".jpg");
                     }
                 }
@@ -308,7 +293,7 @@ namespace testBot
                 var images = await endpointz.SearchGalleryAsync("cat");
                 foreach (var item in images)
                 {
-                    Console.Write("1."+item.ToJson());
+                    //Console.Write("1."+item.ToJson());
                     
                 }
             }
@@ -543,7 +528,7 @@ namespace testBot
 
         private void AddTextCommands()
         {
-            commands.CreateCommand("status")
+            commands.CreateCommand("status")//statuscommand
                 .Description("Shows the status of the bot")
                 .Do(async (e) =>
                 {
@@ -553,7 +538,7 @@ namespace testBot
                     "RexBot v1.0 made by Rexyrex\n" +
                     "===========================\n";
                     helpStr += "Mode : " + mode + " - " + modes[mode].getDescription() + "\n";
-                    helpStr += "Code : " + "1407 lines" + "\n";
+                    helpStr += "Code : " + "1507 lines" + "\n";
                     helpStr += "Age : " + Math.Round((DateTime.Now - dateTime).TotalDays,2) + " days" + "\n";
                     helpStr += "Current Time : " + DateTime.Now.ToString() + "\n";
                     helpStr += "Latest Developer Update : <" + devUpdate + ">\n";
@@ -625,7 +610,7 @@ namespace testBot
                         Discord.Message[] messages;
                         messages = await e.Channel.DownloadMessages(1);
                         await e.Channel.DeleteMessages(messages);
-                        await e.Channel.SendMessage("```css \nI'm going down for maintenance! brb...\n```");
+                        await e.Channel.SendMessage("```css\n[I am going down for maintenance! brb...\n]```");
                         System.Threading.Thread.Sleep(1000);
                         System.Environment.Exit(1);
                     } else
@@ -754,10 +739,7 @@ namespace testBot
                         {
                             string ul = d.url;
                             urls.Add(ul);
-                            Console.WriteLine(ul);
-                            Console.WriteLine("herp derp");
                         }
-                        Console.WriteLine("At least were here");   
                     }
                     await e.Channel.SendMessage(getWord(urls));
 
@@ -784,9 +766,7 @@ namespace testBot
                     {
                         string urlStr = data.url;
                         urls.Add(urlStr);
-                        Console.WriteLine("adding one url");
                     }
-                    Console.WriteLine("done");
                     await e.Channel.SendMessage(getWord(urls));
                     //}
                 });
@@ -860,10 +840,19 @@ namespace testBot
                     await e.Channel.SendMessage(e.GetArg("str"));
                 });
             commands.CreateCommand("aka")
+                .Parameter("username", ParameterType.Optional)
                 .Description("Show all aliases of friends")
                 .Do(async (e) =>
                 {                    
-                    await e.Channel.SendMessage(getAliases());
+                    if(e.Args[0] == "")
+                    {
+                        await e.Channel.SendMessage(getAliases());
+                    } else
+                    {
+                        await e.Channel.SendMessage(getAlias(e.GetArg("username")));
+                    }
+
+                    
                 });
             commands.CreateCommand("img")
                 .Parameter("query",ParameterType.Optional)
@@ -886,7 +875,6 @@ namespace testBot
 
 
                     dynamic dynObj = JsonConvert.DeserializeObject(t);
-                    Console.WriteLine(dynObj);
 
                     foreach(var data in dynObj.data)
                     {
@@ -936,15 +924,23 @@ namespace testBot
                 {
                     string name = e.GetArg("name");
                     string user = e.User.ToString();
-                    if (reports.ContainsKey(name))
-                    {
-                        reports[name]++;
+
+                    if (getAliasKey(name).Contains("None")){
+                        await e.Channel.SendMessage("You're trying to report an unregistered user!");
                     } else
                     {
-                        reports[name] = 1;
+                        name = aliases[getAliasKey(name)];
+                        if (reports.ContainsKey(name))
+                        {
+                            reports[name]++;
+                        }
+                        else
+                        {
+                            reports[name] = 1;
+                        }
+                        await e.Channel.SendMessage("Report successful");
                     }
-
-                    await e.Channel.SendMessage("Report successful");
+                    
                 });
             commands.CreateCommand("allreports")
                 .Description("see reports")
@@ -1061,10 +1057,8 @@ namespace testBot
                             type += content[i];
                     }
                 }
-                topText = topText.Replace(' ', '-');
-                botText = botText.Replace(' ', '-');
-                Console.WriteLine(topText);
-                Console.WriteLine(botText);
+                topText = processTextForMeme(topText);
+                botText = processTextForMeme(botText);
                 string final = "https://memegen.link/" + type + "/" + topText + "/" + botText + ".jpg";
                 content = final;
             }
@@ -1130,7 +1124,7 @@ namespace testBot
 
         private Boolean roll(int chance)
         {
-            int r = rnd.Next(0,100);
+            int r = rnd.Next(1,100);
             if(r<=chance)
             {
                 return true;
@@ -1228,6 +1222,50 @@ namespace testBot
             return res;
         }
 
+        private string getAlias(string username)
+        {
+            string res = string.Empty;
+            res += "Aliases...\n";
+
+            if (getAliasKey(username).Contains("None"))
+            {
+                return "NOT A USER!!";
+            } else
+            {
+                res += aliases[getAliasKey(username)] + " : ";
+                foreach (string als in getAliasKey(username))
+                {
+                    res += als + ", ";
+                }
+            }
+
+            res += "";
+            if (res.Length > 2000)
+            {
+                res = "Too many aliases to display at once";
+            }
+            return res;
+        }
+
+        private string[] getAliasKey(string username)
+        {
+            foreach (KeyValuePair<string[], string> entry in aliases)
+            {
+                if (entry.Value.ToString().ToLower() == username.ToLower())
+                {
+                    return entry.Key;
+                }
+                foreach(string ent in entry.Key)
+                {
+                    if (ent.ToLower() == username.ToLower())
+                    {
+                        return entry.Key;
+                    }
+                }
+            }
+            return new string[]{ "None"};
+        }
+
         private void ParseAliases()
         {
             string line;
@@ -1235,7 +1273,7 @@ namespace testBot
             string res=string.Empty;
             try
             {
-                using (StreamReader sr = new StreamReader(textPath + "alias.txt"))
+                using (StreamReader sr = new StreamReader(textPath + "alias2.txt"))
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -1296,12 +1334,10 @@ namespace testBot
         {
             DirectoryInfo d = new DirectoryInfo(@"C:\Users\Rexyrex\Documents\visual studio 2015\Projects\testBot\testBot\bin\Debug\friendpics");
             FileInfo[] Files = d.GetFiles("*.*");
-            string str = "";
             foreach (FileInfo file in Files)
             {
                 picNames.Add(file.Name);
             }
-            Console.WriteLine(str);
         }
 
         public string makeHTTPRequest(string givenURL)

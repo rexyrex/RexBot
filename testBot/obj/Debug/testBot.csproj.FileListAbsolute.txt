@@ -108,3 +108,4 @@ C:\Users\Rexyrex\documents\visual studio 2015\Projects\testBot\testBot\bin\Debug
 C:\Users\Rexyrex\documents\visual studio 2015\Projects\testBot\testBot\bin\Debug\texts\memeType.txt
 C:\Users\Rexyrex\documents\visual studio 2015\Projects\testBot\testBot\bin\Debug\friendpics\eJwVzMENwyAMAMBdGABjIBCyDSKIUIUaYfcVdfeqN8A96rNudahLZPIBcHYutE7NQiu3qhtRu2uenXWhAVkkl2vUtzA4k3YTvDPexs1vAQ04xOhTdNYGtGnHGKCPf_OaTX1_veUhxQ.jpg
 C:\Users\Rexyrex\documents\visual studio 2015\Projects\testBot\testBot\bin\Debug\texts\rexdb.txt
+C:\Users\Rexyrex\documents\visual studio 2015\Projects\testBot\testBot\bin\Debug\texts\alias2.txt
