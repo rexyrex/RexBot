@@ -1333,7 +1333,7 @@ namespace testBot
 
         private void populatePicFileNames()
         {
-            DirectoryInfo d = new DirectoryInfo(@"C:\Users\Rexyrex\Documents\visual studio 2015\Projects\testBot\testBot\bin\Debug\friendpics");
+            DirectoryInfo d = new DirectoryInfo("friendpics/");
             FileInfo[] Files = d.GetFiles("*.*");
             foreach (FileInfo file in Files)
             {
